@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gods CMS</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <!-- Add these stylesheets -->
+    <link rel="stylesheet" type="text/css" href="assets/css/materialdesignicons.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/mobiriseicons.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    <style>
+        body {
+            background-color: #202020;
+            color: rgb(230, 230, 230);
+            margin: 0;
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 500%;
+            margin-bottom: 20px;
+        }
+
+        .image-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .fixed-image {
+            width: 200px;
+            height: auto;
+        }
+
+        .form-container {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .form-container input, .form-container select {
+            margin-bottom: 10px;
+            padding-top: 10px;
+        }
+
+        /* Add these new styles */
+        .window-body {
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #addLinkForm {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .field-row-stacked {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .field-row-stacked input,
+        .field-row-stacked select {
+            width: 100%;
+        }
+
+        .submit-button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .title-bar-text {
+            color: white;
+        }
+
+        #linksList {
+            color: black;
+            font-size: 18px;
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #linksList li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            word-break: break-word;
+            background-color: #d5d5d500;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        #linksList li span {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        #linksList li button {
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            #linksList {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            #linksList {
+                font-size: 14px;
+            }
+        }
+
+        #previewSection {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #202020;
+            width: 300px;
+            height: 400px;
+            overflow-y: auto;
+        }
+
+        #previewSection h2 {
+            color: white;
+            text-align: center;
+            font-size: 24px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        #previewLinks a,
+        #previewSection a {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+            text-decoration: none;
+            color: white !important;
+            background-color: #333;
+            border-radius: 30px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        #previewLinks a:hover,
+        #previewSection a:hover {
+            background-color: #007bff;
+        }
+
+        #previewNewLink {
+            background-color: #007bff !important;
+        }
+
+        .tiktok-icon {
+            width: 15px;
+            height: 15px;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+    </style>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-client.js"></script>
+</head>
+<body>
+    <h1>The Gods CMS</h1>
+    <div class="image-container">
+        <img src="assets/images/icon.png" alt="The Gods CMS" class="fixed-image"/>
+    </div>
+    
+    <div class="window" style="width: 80%;">
+        <div>
+            <div class="title-bar">
+                <div class="title-bar-text">Add New Link</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize"></button>
+                    <button aria-label="Maximize"></button>
+                    <button aria-label="Close"></button> 
+                </div>
+            </div>
+            <div class="window-body">
+                <form id="addLinkForm">
+                    <div class="field-row-stacked">
+                        <label for="linkText">Link Text</label>
+                        <input type="text" id="linkText" required>
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="linkUrl">Link URL</label>
+                        <input type="text" id="linkUrl" required>
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="icon">Icon URL or MDI Class</label>
+                        <input type="text" id="icon">
+                    </div>
+                    <!-- Replace the icon size input with a smaller slider -->
+                    <div class="field-row-stacked" style="width: 25%; margin: 0 auto; text-align: center;">
+                        <label for="iconSize">Icon Size (px): <span id="iconSizeValue">24</span></label>
+                        <input type="range" id="iconSize" min="8" max="48" value="24" step="1" style="width: 100%;">
+                    </div>
+                    <!-- Replace the position input with a centered dropdown menu -->
+                    <div class="field-row-stacked" style="width: 25%; margin: 10px auto; text-align: center;">
+                        <label for="position">Position</label>
+                        <select id="position" style="width: 100%;">
+                            <option value="">Select position</option>
+                            <!-- Options 0-20 will be added dynamically -->
+                        </select>
+                    </div>
+                    <div class="submit-button-container">
+                        <button type="submit" class="btn btn-primary">Add Link</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="window" style="width: 80%; margin-top: 20px;">
+        <div class="title-bar">
+            <div class="title-bar-text">Preview</div>
+        </div>
+        <div class="window-body">
+            <div id="previewSection">
+                <h2>The God's Presents</h2>
+                <div id="previewLinks">
+                    <!-- Custom links will be inserted here -->
+                </div>
+                <a href="#" class="btn btn-round btn-custom">Soundcloud <i class="mdi mdi-soundcloud"></i></a>
+                <a href="#" class="btn btn-round btn-custom">Facebook <i class="mdi mdi-facebook"></i></a>
+                <a href="#" class="btn btn-round btn-custom">Discord <i class="mdi mdi-discord"></i></a>
+                <a href="#" class="btn btn-round btn-custom">Instagram <i class="mdi mdi-instagram"></i></a>
+                <a href="#" class="btn btn-round btn-custom">TikTok <img src="https://static-00.iconduck.com/assets.00/tik-tok-icon-1777x2048-102ej595.png" alt=" " class="tiktok-icon"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="window" style="width: 80%; min-height: 100px; margin-top: 20px;">
+        <div class="title-bar">
+            <div class="title-bar-text">Links List</div>
+        </div>
+        <div class="window-body" style="padding: 10px;">
+            <ul id="linksList"></ul>
+        </div>
+    </div>
+
+    <script>
+        const iconSizeSlider = document.getElementById('iconSize');
+        const iconSizeValue = document.getElementById('iconSizeValue');
+        iconSizeSlider.oninput = function() {
+            iconSizeValue.textContent = this.value;
+        }
+
+        function updateIconPreview() {
+            const linkText = document.getElementById('linkText').value;
+            const iconInput = document.getElementById('icon').value;
+            const iconSize = document.getElementById('iconSize').value;
+            const position = document.getElementById('position').value;
+            const previewLinks = document.getElementById('previewLinks');
+
+            let iconHtml = '';
+            if (iconInput.startsWith('mdi-')) {
+                iconHtml = `<i class="mdi ${iconInput}" style="font-size: ${iconSize}px;"></i>`;
+            } else if (iconInput.trim() !== '') {
+                iconHtml = `<img src="${iconInput}" alt="Icon" style="width: ${iconSize}px; height: ${iconSize}px;">`;
+            }
+
+            // Remove existing preview link if it exists
+            const existingPreview = document.getElementById('previewNewLink');
+            if (existingPreview) {
+                existingPreview.remove();
+            }
+
+            // Create new preview link
+            const newLinkPreview = document.createElement('a');
+            newLinkPreview.href = '#';
+            newLinkPreview.className = 'btn btn-round btn-custom';
+            newLinkPreview.id = 'previewNewLink';
+            newLinkPreview.innerHTML = `${linkText} ${iconHtml}`;
+
+            // Insert the new link at the specified position
+            const insertPosition = position ? parseInt(position) : previewLinks.children.length;
+            if (insertPosition < previewLinks.children.length) {
+                previewLinks.insertBefore(newLinkPreview, previewLinks.children[insertPosition]);
+            } else {
+                previewLinks.appendChild(newLinkPreview);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const addLinkForm = document.getElementById('addLinkForm');
+            const linksList = document.getElementById('linksList');
+
+            ['linkText', 'icon', 'iconSize', 'position'].forEach(id => {
+                document.getElementById(id).addEventListener('change', updateIconPreview);
+            });
+
+            addLinkForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const linkName = document.getElementById('linkText').value;
+                const linkUrl = document.getElementById('linkUrl').value;
+                const icon = document.getElementById('icon').value;
+                const iconSize = document.getElementById('iconSize').value;
+                const position = document.getElementById('position').value;
+
+                try {
+                    console.log('Submitting form:', { linkName, linkUrl, icon, iconSize, position });
+                    const data = await addLinkToSupabase(linkName, linkUrl, icon, iconSize, position);
+                    
+                    console.log('Link added successfully:', data);
+                    alert('Link added successfully!');
+
+                    // Reset the form
+                    this.reset();
+
+                    // Update the links list
+                    await updateLinksList();
+                } catch (error) {
+                    console.error('Error adding link:', error);
+                    alert('Error adding link. Please check the console for details.');
+                }
+            });
+
+            async function updateLinksList() {
+                try {
+                    const links = await getLinksFromSupabase();
+                    console.log('Fetched links:', links);
+
+                    linksList.innerHTML = '';
+                    const previewLinks = document.getElementById('previewLinks');
+                    previewLinks.innerHTML = ''; // Clear existing preview links
+
+                    links.forEach(link => {
+                        // Add to links list
+                        const li = document.createElement('li');
+                        li.setAttribute('data-id', link.id);
+                        li.innerHTML = `
+                            <span>${link.name} - ${link.url} 
+                            (Icon: ${link.icon ? 'Yes' : 'No'}, 
+                            Size: ${link.iconSize || 'Default'},
+                            Position: ${link.position || 'Not set'})
+                            </span>
+                            <button onclick="removeLink(${link.id})" class="btn btn-danger btn-sm" style="width: 30px; height: 30px; padding: 0; font-size: 12px;">X</button>
+                        `;
+                        linksList.appendChild(li);
+
+                        // Add to preview
+                        const previewLink = document.createElement('a');
+                        previewLink.href = link.url;
+                        previewLink.className = 'btn btn-round btn-custom';
+                        previewLink.setAttribute('data-id', link.id);
+                        let iconHtml = '';
+                        if (link.icon) {
+                            if (link.icon.startsWith('mdi-')) {
+                                iconHtml = `<i class="mdi ${link.icon}" style="font-size: ${link.iconSize || 24}px;"></i>`;
+                            } else if (link.icon.trim() !== '') {
+                                iconHtml = `<img src="${link.icon}" alt="" style="width: ${link.iconSize || 24}px; height: ${link.iconSize || 24}px;">`;
+                            }
+                        }
+                        previewLink.innerHTML = `${link.name} ${iconHtml}`;
+                        previewLinks.appendChild(previewLink);
+                    });
+                } catch (error) {
+                    console.error('Error fetching links:', error);
+                }
+            }
+
+            // Initial load of links
+            updateLinksList();
+        });
+
+        async function removeLink(linkId) {
+            try {
+                await removeLinkFromSupabase(linkId);
+                
+                // Remove the link from the preview
+                const previewLink = document.querySelector(`#previewLinks a[data-id="${linkId}"]`);
+                if (previewLink) {
+                    previewLink.remove();
+                }
+
+                // Remove the link from the links list
+                const listItem = document.querySelector(`#linksList li[data-id="${linkId}"]`);
+                if (listItem) {
+                    listItem.remove();
+                }
+
+                console.log('Link removed successfully');
+            } catch (error) {
+                console.error('Error removing link:', error);
+                alert('Error removing link. Please try again.');
+            }
+        }
+
+        // Add this script to populate the dropdown menu
+        const positionSelect = document.getElementById('position');
+        for (let i = 0; i <= 20; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            positionSelect.appendChild(option);
+        }
+    </script>
+</body>
+</html>

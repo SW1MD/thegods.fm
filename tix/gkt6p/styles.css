@@ -1,0 +1,63 @@
+/* Custom styles */
+:root {
+    --background-color: #f8f9fa;
+    --text-color: #212529;
+    --container-bg: #ffffff;
+    --container-shadow: rgba(0, 0, 0, 0.1);
+    --confirmation-bg: #d4edda;
+    --confirmation-border: #c3e6cb;
+    --confirmation-color: #155724;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #212529;
+        --text-color: #f8f9fa;
+        --container-bg: #343a40;
+        --container-shadow: rgba(255, 255, 255, 0.1);
+        --confirmation-bg: #1e4620;
+        --confirmation-border: #2a623d;
+        --confirmation-color: #d4edda;
+    }
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.container {
+    background-color: var(--container-bg);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px var(--container-shadow);
+}
+
+#paypal-button-container {
+    max-width: 300px;
+    margin-top: 20px;
+}
+
+#confirmationMessage {
+    background-color: var(--confirmation-bg);
+    border: 1px solid var(--confirmation-border);
+    color: var(--confirmation-color);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 30px;
+}
+
+@media (max-width: 767px) {
+    .container {
+        text-align: center;
+    }
+    
+    #paypal-button-container {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+.hidden {
+    display: none;
+}

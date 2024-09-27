@@ -295,12 +295,15 @@
             newLinkPreview.innerHTML = `${linkText} ${iconHtml}`;
 
             // Insert the new link at the specified position
-            const insertPosition = position ? parseInt(position) : previewLinks.children.length;
-            if (insertPosition < previewLinks.children.length) {
-                previewLinks.insertBefore(newLinkPreview, previewLinks.children[insertPosition]);
+            const insertPosition = position !== '' ? parseInt(position) : previewLinks.children.length;
+            const existingLinks = Array.from(previewLinks.children);
+            if (insertPosition < existingLinks.length) {
+                previewLinks.insertBefore(newLinkPreview, existingLinks[insertPosition]);
             } else {
                 previewLinks.appendChild(newLinkPreview);
             }
+
+            console.log('Preview updated:', { linkText, iconInput, iconSize, position, insertPosition });
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -308,7 +311,7 @@
             const linksList = document.getElementById('linksList');
 
             ['linkText', 'icon', 'iconSize', 'position'].forEach(id => {
-                document.getElementById(id).addEventListener('change', updateIconPreview);
+                document.getElementById(id).addEventListener('input', updateIconPreview);
             });
 
             addLinkForm.addEventListener('submit', async function(e) {

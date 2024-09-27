@@ -6,24 +6,23 @@ const { createClient } = supabase;
 
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-async function addLinkToSupabase(linkName, linkUrl, icon, iconSize, position) {
-    console.log('Adding link:', { linkName, linkUrl, icon, iconSize, position });
+async function addLinkToSupabase(linkName, linkUrl, icon, position, upcoming) {
+    console.log('Adding link:', { linkName, linkUrl, icon, position, upcoming });
     const { data, error } = await supabaseClient
         .from('links')
         .insert([
             { 
                 name: linkName, 
                 url: linkUrl, 
-                icon: icon,
-                iconSize: iconSize,
-                position: position !== '' ? parseInt(position) : null
+                icon: icon, 
+                position: position !== '' ? parseInt(position) : null,
+                upcoming: upcoming
             }
-        ])
-        .select();  // Add this line to return the inserted data
+        ]);
     
     console.log('Supabase response:', { data, error });
     if (error) throw error;
-    return data[0];  // Return the first (and only) inserted item
+    return data;
 }
 
 async function getLinksFromSupabase() {
@@ -31,6 +30,8 @@ async function getLinksFromSupabase() {
         .from('links')
         .select('*')
         .order('position', { ascending: true, nullsLast: true });
+    
+    console.log('Links from Supabase:', data);
     
     if (error) throw error;
     return data;
@@ -50,9 +51,15 @@ async function loadDynamicLinks() {
 
             if (links.length === 0) {
                 console.log('No links found in Supabase');
+                // Hide the dynamic links container to show the original layout
                 dynamicLinksContainer.style.display = 'none';
             } else {
+                // Show the dynamic links container
                 dynamicLinksContainer.style.display = 'block';
+
+                // Get all existing buttons
+                const existingButtons = Array.from(container.children);
+                const upcomingEventsIndex = existingButtons.findIndex(el => el.querySelector('a[href*="eventbrite.com"]'));
 
                 // Sort links by position
                 links.sort((a, b) => (a.position ?? Infinity) - (b.position ?? Infinity));
@@ -62,9 +69,9 @@ async function loadDynamicLinks() {
                     let iconHtml = '';
                     if (link.icon) {
                         if (link.icon.startsWith('mdi-')) {
-                            iconHtml = `<i class="mdi ${link.icon}" style="font-size: ${link.iconSize || 24}px; color: white;"></i>`;
+                            iconHtml = `<i class="mdi ${link.icon}"></i>`;
                         } else if (link.icon.trim() !== '') {
-                            iconHtml = `<img src="${link.icon}" alt="" style="width: ${link.iconSize || 24}px; height: ${link.iconSize || 24}px;">`;
+                            iconHtml = `<img src="${link.icon}" alt="" style="width: 15px; height: 15px; margin-left: 5px; vertical-align: middle;">`;
                         }
                     }
 
@@ -77,7 +84,24 @@ async function loadDynamicLinks() {
                         </a>
                     `;
 
-                    dynamicLinksContainer.appendChild(linkElement);
+                    if (link.position !== null && link.position !== undefined) {
+                        let actualIndex = link.position;
+                        
+                        // Adjust for the "UPCOMING EVENTS" button if necessary
+                        if (actualIndex > upcomingEventsIndex && upcomingEventsIndex !== -1) {
+                            actualIndex++;
+                        }
+
+                        if (actualIndex < existingButtons.length) {
+                            container.insertBefore(linkElement, existingButtons[actualIndex]);
+                            existingButtons.splice(actualIndex, 0, linkElement);
+                        } else {
+                            container.appendChild(linkElement);
+                            existingButtons.push(linkElement);
+                        }
+                    } else {
+                        dynamicLinksContainer.appendChild(linkElement);
+                    }
 
                     console.log('Link added to container:', linkElement.innerHTML);
                 });
@@ -91,11 +115,13 @@ async function loadDynamicLinks() {
 }
 
 async function removeLinkFromSupabase(linkId) {
+    console.log('Removing link with ID:', linkId);
     const { data, error } = await supabaseClient
         .from('links')
         .delete()
         .eq('id', linkId);
     
+    console.log('Supabase response:', { data, error });
     if (error) throw error;
     return data;
 }

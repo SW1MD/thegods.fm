@@ -5,24 +5,21 @@
 * Updated          : June 2023
 * File Description : Main JavaScript file ----------------------------------- */
 
-! function($) {
+!function($) {
     "use strict";
 
     class Treelink {
-        constructor() { }
-        //PreLoader
+        constructor() {}
+        
         initPreLoader() {
             $('#status').fadeOut();
             $('#preloader').delay(350).fadeOut('slow');
-            $('body').delay(350).css({
-                'overflow': 'visible'
-            });
+            $('body').delay(350).css({'overflow': 'visible'});
         }
-        //scroll
+        
         initStickyMenu() {
             var navbar = document.querySelector('nav');
-            window.onscroll = function () {
-                // pageYOffset or scrollY
+            window.onscroll = function() {
                 if (window.pageYOffset > 30) {
                     navbar.classList.add('stickyadd');
                 } else {
@@ -30,40 +27,38 @@
                 }
             };
         }
-        //Scrollspy
+        
         initScrollspy() {
             var scrollSpy = new bootstrap.ScrollSpy(document.body, {
                 target: '#main_nav',
                 offset: 70
             });
         }
-        // BACK TO TOP
+        
         initBackToTop() {
-            $(window).on('scroll', function () {
+            $(window).on('scroll', function() {
                 if ($(this).scrollTop() > 100) {
                     $('.back_top').fadeIn();
                 } else {
                     $('.back_top').fadeOut();
                 }
             });
-            $('.back_top').click(function () {
-                $("html, body").animate({ scrollTop: 0 }, 1000);
+            $('.back_top').click(function() {
+                $("html, body").animate({scrollTop: 0}, 1000);
                 return false;
             });
         }
+        
         init() {
             this.initPreLoader();
             this.initStickyMenu();
             this.initScrollspy();
             this.initBackToTop();
         }
-        
     }
-    //init
+    
     $.Treelink = new Treelink, $.Treelink.Constructor = Treelink
 }(window.jQuery),
-
-//initializing
 function($) {
     "use strict";
     $.Treelink.init();

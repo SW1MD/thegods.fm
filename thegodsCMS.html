@@ -177,6 +177,100 @@
             margin-left: 5px;
             vertical-align: middle;
         }
+
+        #loginForm {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        #loginForm input {
+            margin-bottom: 10px;
+            width: 200px;
+        }
+
+        #cmsContent {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Add these new styles for the incorrect login dialog */
+        #incorrectLoginDialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1001;  /* Ensure it's above the login form */
+            width: 300px;
+            background-color: #c0c0c0;
+            border: 1px solid #000000;
+            box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px grey, inset 2px 2px #fff;
+        }
+
+        #incorrectLoginDialog .window-body {
+            padding: 16px;
+        }
+
+        #incorrectLoginDialog p {
+            margin-bottom: 16px;
+        }
+
+        #incorrectLoginDialog .button-container {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        #incorrectLoginDialog button {
+            min-width: 70px;
+        }
+
+        /* Add these new styles to center the main windows */
+        .main-window {
+            width: 80%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        /* Adjust the login form style */
+        #loginForm {
+            width: 300px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+
+        #loginForm .title-bar {
+            width: 100%;
+        }
+
+        #loginForm .window-body {
+            padding: 16px;
+        }
+
+        /* Add these new styles for the remove button */
+        .remove-link-button {
+            width: 25px;
+            height: 25px;
+            padding: 0;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: #c0c0c0;
+            border: 2px outset #dfdfdf;
+            box-shadow: 1px 1px 0 0 #000;
+            color: #000;
+            cursor: pointer;
+        }
+
+        .remove-link-button:active {
+            border-style: inset;
+            box-shadow: none;
+        }
     </style>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="assets/js/supabase-client.js"></script>
@@ -187,126 +281,157 @@
         <img src="assets/images/icon.png" alt="The Gods CMS" class="fixed-image"/>
     </div>
     
-    <div class="window" style="width: 80%;">
-        <div>
-            <div class="title-bar">
-                <div class="title-bar-text">Add New Link</div>
-                <div class="title-bar-controls">
-                    <button aria-label="Minimize"></button>
-                    <button aria-label="Maximize"></button>
-                    <button aria-label="Close"></button> 
-                </div>
-            </div>
-            <div class="window-body">
-                <form id="addLinkForm">
-                    <div class="field-row-stacked">
-                        <label for="linkText">Link Text</label>
-                        <input type="text" id="linkText" required>
-                    </div>
-                    <div class="field-row-stacked">
-                        <label for="linkUrl">Link URL</label>
-                        <input type="text" id="linkUrl" required>
-                    </div>
-                    <div class="field-row-stacked">
-                        <label for="icon">Icon URL or MDI Class</label>
-                        <input type="text" id="icon">
-                    </div>
-                    <!-- Replace the icon size input with a smaller slider -->
-                    <div class="field-row-stacked" style="width: 25%; margin: 0 auto; text-align: center;">
-                        <label for="iconSize">Icon Size (px): <span id="iconSizeValue">24</span></label>
-                        <input type="range" id="iconSize" min="8" max="48" value="24" step="1" style="width: 100%;">
-                    </div>
-                    <!-- Replace the position input with a centered dropdown menu -->
-                    <div class="field-row-stacked" style="width: 25%; margin: 10px auto; text-align: center;">
-                        <label for="position">Position</label>
-                        <select id="position" style="width: 100%;">
-                            <option value="">Select position</option>
-                            <!-- Options 0-20 will be added dynamically -->
-                        </select>
-                    </div>
-                    <div class="submit-button-container">
-                        <button type="submit" class="btn btn-primary">Add Link</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="window" style="width: 80%; margin-top: 20px;">
+    <div id="loginForm" class="window">
         <div class="title-bar">
-            <div class="title-bar-text">Preview</div>
+            <div class="title-bar-text">Login</div>
         </div>
         <div class="window-body">
-            <div id="previewSection">
-                <h2>The God's Presents</h2>
-                <div id="previewLinks">
-                    <!-- Custom links will be inserted here -->
+            <form id="loginFormElement">
+                <div class="field-row-stacked">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
                 </div>
-                <a href="#" class="btn btn-round btn-custom">Soundcloud <i class="mdi mdi-soundcloud"></i></a>
-                <a href="#" class="btn btn-round btn-custom">Facebook <i class="mdi mdi-facebook"></i></a>
-                <a href="#" class="btn btn-round btn-custom">Discord <i class="mdi mdi-discord"></i></a>
-                <a href="#" class="btn btn-round btn-custom">Instagram <i class="mdi mdi-instagram"></i></a>
-                <a href="#" class="btn btn-round btn-custom">TikTok <img src="https://static-00.iconduck.com/assets.00/tik-tok-icon-1777x2048-102ej595.png" alt=" " class="tiktok-icon"></a>
+                <div class="field-row-stacked">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="field-row">
+                    <button type="submit">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add this new incorrect login dialog -->
+    <div id="incorrectLoginDialog" class="window">
+        <div class="title-bar">
+            <div class="title-bar-text">Login Error</div>
+            <div class="title-bar-controls">
+                
+            </div>
+        </div>
+        <div class="window-body">
+            <p>Incorrect username or password. Please try again.</p>
+            <div class="button-container">
+                <button onclick="closeIncorrectLoginDialog()">OK</button>
             </div>
         </div>
     </div>
 
-    <div class="window" style="width: 80%; min-height: 100px; margin-top: 20px;">
-        <div class="title-bar">
-            <div class="title-bar-text">Links List</div>
+    <div id="cmsContent">
+        <div class="window main-window">
+            <div>
+                <div class="title-bar">
+                    <div class="title-bar-text">Add New Link</div>
+                    <div class="title-bar-controls">
+                        <button aria-label="Minimize"></button>
+                        <button aria-label="Maximize"></button>
+                        <button aria-label="Close"></button> 
+                    </div>
+                </div>
+                <div class="window-body">
+                    <form id="addLinkForm">
+                        <div class="field-row-stacked">
+                            <label for="linkText">Link Text</label>
+                            <input type="text" id="linkText" required>
+                        </div>
+                        <div class="field-row-stacked">
+                            <label for="linkUrl">Link URL</label>
+                            <input type="text" id="linkUrl" required>
+                        </div>
+                        <div class="field-row-stacked">
+                            <label for="icon">Icon URL or MDI Class</label>
+                            <input type="text" id="icon">
+                        </div>
+                        <!-- Replace the icon size input with a smaller slider -->
+                        <div class="field-row-stacked" style="width: 25%; margin: 0 auto; text-align: center;">
+                            <label for="iconSize">Icon Size (px): <span id="iconSizeValue">24</span></label>
+                            <input type="range" id="iconSize" min="8" max="48" value="24" step="1" style="width: 100%;">
+                        </div>
+                        <!-- Replace the position input with a centered dropdown menu -->
+                        <div class="field-row-stacked" style="width: 25%; margin: 10px auto; text-align: center;">
+                            <label for="position">Position</label>
+                            <select id="position" style="width: 100%;">
+                                <option value="">Select position</option>
+                                <!-- Options 0-20 will be added dynamically -->
+                            </select>
+                        </div>
+                        <div class="submit-button-container">
+                            <button type="submit" class="btn btn-primary">Add Link</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="window-body" style="padding: 10px;">
-            <ul id="linksList"></ul>
+
+        <div class="window main-window">
+            <div class="title-bar">
+                <div class="title-bar-text">Preview</div>
+            </div>
+            <div class="window-body">
+                <div id="previewSection">
+                    <h2>The God's Presents</h2>
+                    <div id="previewLinks">
+                        <!-- Custom links will be inserted here -->
+                    </div>
+                    <a href="#" class="btn btn-round btn-custom">Soundcloud <i class="mdi mdi-soundcloud"></i></a>
+                    <a href="#" class="btn btn-round btn-custom">Facebook <i class="mdi mdi-facebook"></i></a>
+                    <a href="#" class="btn btn-round btn-custom">Discord <i class="mdi mdi-discord"></i></a>
+                    <a href="#" class="btn btn-round btn-custom">Instagram <i class="mdi mdi-instagram"></i></a>
+                    <a href="#" class="btn btn-round btn-custom">TikTok <img src="https://static-00.iconduck.com/assets.00/tik-tok-icon-1777x2048-102ej595.png" alt=" " class="tiktok-icon"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="window main-window">
+            <div class="title-bar">
+                <div class="title-bar-text">Links List</div>
+            </div>
+            <div class="window-body" style="padding: 10px;">
+                <ul id="linksList"></ul>
+            </div>
         </div>
     </div>
 
-    <script>
-        const iconSizeSlider = document.getElementById('iconSize');
-        const iconSizeValue = document.getElementById('iconSizeValue');
-        iconSizeSlider.oninput = function() {
-            iconSizeValue.textContent = this.value;
-        }
-
-        function updateIconPreview() {
-            const linkText = document.getElementById('linkText').value;
-            const iconInput = document.getElementById('icon').value;
-            const iconSize = document.getElementById('iconSize').value;
-            const position = document.getElementById('position').value;
-            const previewLinks = document.getElementById('previewLinks');
-
-            let iconHtml = '';
-            if (iconInput.startsWith('mdi-')) {
-                iconHtml = `<i class="mdi ${iconInput}" style="font-size: ${iconSize}px;"></i>`;
-            } else if (iconInput.trim() !== '') {
-                iconHtml = `<img src="${iconInput}" alt="Icon" style="width: ${iconSize}px; height: ${iconSize}px;">`;
-            }
-
-            // Remove existing preview link if it exists
-            const existingPreview = document.getElementById('previewNewLink');
-            if (existingPreview) {
-                existingPreview.remove();
-            }
-
-            // Create new preview link
-            const newLinkPreview = document.createElement('a');
-            newLinkPreview.href = '#';
-            newLinkPreview.className = 'btn btn-round btn-custom';
-            newLinkPreview.id = 'previewNewLink';
-            newLinkPreview.innerHTML = `${linkText} ${iconHtml}`;
-
-            // Insert the new link at the specified position
-            const insertPosition = position !== '' ? parseInt(position) : previewLinks.children.length;
-            const existingLinks = Array.from(previewLinks.children);
-            if (insertPosition < existingLinks.length) {
-                previewLinks.insertBefore(newLinkPreview, existingLinks[insertPosition]);
-            } else {
-                previewLinks.appendChild(newLinkPreview);
-            }
-
-            console.log('Preview updated:', { linkText, iconInput, iconSize, position, insertPosition });
-        }
+    <script type="module">
+        import { addLinkToSupabase, getLinksFromSupabase, removeLinkFromSupabase, authenticateUser } from './assets/js/supabase-client.js';
 
         document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginFormElement');
+            const loginFormContainer = document.getElementById('loginForm');
+            const cmsContent = document.getElementById('cmsContent');
+            const incorrectLoginDialog = document.getElementById('incorrectLoginDialog');
+
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                console.log('Login attempt:', username);
+
+                try {
+                    const result = await authenticateUser(username, password);
+                    console.log('Authentication result:', result);
+
+                    if (result.success) {
+                        loginFormContainer.style.display = 'none';
+                        cmsContent.style.display = 'flex';
+                        console.log('Login successful, CMS content displayed');
+                    } else {
+                        incorrectLoginDialog.style.display = 'block';
+                        console.log('Login failed:', result.message);
+                    }
+                } catch (error) {
+                    console.error('Authentication error:', error);
+                    alert('An error occurred during login. Please check the console for details.');
+                }
+            });
+
+            // Add this function to close the incorrect login dialog
+            window.closeIncorrectLoginDialog = function() {
+                incorrectLoginDialog.style.display = 'none';
+            };
+
             const addLinkForm = document.getElementById('addLinkForm');
             const linksList = document.getElementById('linksList');
 
@@ -360,7 +485,7 @@
                             Size: ${link.iconSize || 'Default'},
                             Position: ${link.position || 'Not set'})
                             </span>
-                            <button onclick="removeLink(${link.id})" class="btn btn-danger btn-sm" style="width: 30px; height: 30px; padding: 0; font-size: 12px;">X</button>
+                            <button onclick="removeLink(${link.id})" class="remove-link-button">X</button>
                         `;
                         linksList.appendChild(li);
 
@@ -419,6 +544,55 @@
             option.value = i;
             option.textContent = i;
             positionSelect.appendChild(option);
+        }
+
+        function closeIncorrectLoginDialog() {
+            document.getElementById('incorrectLoginDialog').style.display = 'none';
+        }
+
+        const iconSizeSlider = document.getElementById('iconSize');
+        const iconSizeValue = document.getElementById('iconSizeValue');
+        iconSizeSlider.oninput = function() {
+            iconSizeValue.textContent = this.value;
+        }
+
+        function updateIconPreview() {
+            const linkText = document.getElementById('linkText').value;
+            const iconInput = document.getElementById('icon').value;
+            const iconSize = document.getElementById('iconSize').value;
+            const position = document.getElementById('position').value;
+            const previewLinks = document.getElementById('previewLinks');
+
+            let iconHtml = '';
+            if (iconInput.startsWith('mdi-')) {
+                iconHtml = `<i class="mdi ${iconInput}" style="font-size: ${iconSize}px;"></i>`;
+            } else if (iconInput.trim() !== '') {
+                iconHtml = `<img src="${iconInput}" alt="Icon" style="width: ${iconSize}px; height: ${iconSize}px;">`;
+            }
+
+            // Remove existing preview link if it exists
+            const existingPreview = document.getElementById('previewNewLink');
+            if (existingPreview) {
+                existingPreview.remove();
+            }
+
+            // Create new preview link
+            const newLinkPreview = document.createElement('a');
+            newLinkPreview.href = '#';
+            newLinkPreview.className = 'btn btn-round btn-custom';
+            newLinkPreview.id = 'previewNewLink';
+            newLinkPreview.innerHTML = `${linkText} ${iconHtml}`;
+
+            // Insert the new link at the specified position
+            const insertPosition = position !== '' ? parseInt(position) : previewLinks.children.length;
+            const existingLinks = Array.from(previewLinks.children);
+            if (insertPosition < existingLinks.length) {
+                previewLinks.insertBefore(newLinkPreview, existingLinks[insertPosition]);
+            } else {
+                previewLinks.appendChild(newLinkPreview);
+            }
+
+            console.log('Preview updated:', { linkText, iconInput, iconSize, position, insertPosition });
         }
     </script>
 </body>

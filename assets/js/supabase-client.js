@@ -143,3 +143,39 @@ async function removeLink(linkId) {
 // Export the functions
 window.loadDynamicLinks = loadDynamicLinks;
 window.removeLink = removeLink;
+
+async function authenticateUser(username, password) {
+    console.log('Attempting to authenticate user:', username);
+    try {
+        const { data, error } = await supabaseClient
+            .from('users')
+            .select('*')
+            .eq('username', username)
+            .single();
+
+        if (error) {
+            console.error('Supabase error:', error);
+            return { success: false, message: 'Database error', error };
+        }
+
+        console.log('User data retrieved:', data);
+
+        if (!data) {
+            return { success: false, message: 'User not found' };
+        }
+
+        if (data.password === password) {  // In real-world, use proper password hashing
+            console.log('Authentication successful');
+            return { success: true, message: 'Login successful' };
+        }
+
+        console.log('Authentication failed: incorrect password');
+        return { success: false, message: 'Incorrect password' };
+    } catch (error) {
+        console.error('Authentication error:', error);
+        return { success: false, message: 'Unexpected error', error };
+    }
+}
+
+// Make sure to export the function
+export { supabaseClient, addLinkToSupabase, getLinksFromSupabase, removeLinkFromSupabase, authenticateUser };

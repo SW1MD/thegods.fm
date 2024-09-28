@@ -20,10 +20,13 @@
         initStickyMenu() {
             var navbar = document.querySelector('nav');
             window.onscroll = function() {
-                if (window.pageYOffset > 30) {
-                    navbar.classList.add('stickyadd');
-                } else {
-                    navbar.classList.remove('stickyadd');
+                var navbar = document.querySelector('.navbar');
+                if (navbar) {
+                    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                        navbar.classList.add("nav-sticky");
+                    } else {
+                        navbar.classList.remove("nav-sticky");
+                    }
                 }
             };
         }

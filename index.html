@@ -323,20 +323,21 @@
         <!-- Add a google analytics script here if you want to track the site -->
 
         <!-- Add this script to load dynamic links -->
+        <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+        <script src="assets/js/supabase-client.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                console.log('DOM fully loaded');
-                try {
-                    loadDynamicLinks().then(() => {
-                        console.log('loadDynamicLinks completed');
-                    }).catch((error) => {
-                        console.error('Error in loadDynamicLinks:', error);
-                    });
-                } catch (error) {
-                    console.error('Error calling loadDynamicLinks:', error);
+                if (typeof window.loadDynamicLinks === 'function') {
+                    window.loadDynamicLinks();
+                } else {
+                    console.error('loadDynamicLinks function not found');
                 }
             });
         </script>
+
+        <div id="previewLinks">
+            <!-- Dynamic links will be inserted here -->
+        </div>
 
     </body>
 </html>

@@ -394,13 +394,20 @@
     </div>
 
     <script type="module">
-        import { addLinkToSupabase, getLinksFromSupabase, removeLinkFromSupabase, authenticateUser } from './assets/js/supabase-client.js';
+        import { addLinkToSupabase, getLinksFromSupabase, removeLinkFromSupabase, authenticateUser, checkSession, logout } from './assets/js/supabase-client.js';
 
         document.addEventListener('DOMContentLoaded', function() {
             const loginForm = document.getElementById('loginFormElement');
             const loginFormContainer = document.getElementById('loginForm');
             const cmsContent = document.getElementById('cmsContent');
             const incorrectLoginDialog = document.getElementById('incorrectLoginDialog');
+
+            // Check session on page load
+            if (checkSession()) {
+                loginFormContainer.style.display = 'none';
+                cmsContent.style.display = 'flex';
+                console.log('Session active, CMS content displayed');
+            }
 
             loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -427,10 +434,15 @@
                 }
             });
 
-            // Add this function to close the incorrect login dialog
-            window.closeIncorrectLoginDialog = function() {
-                incorrectLoginDialog.style.display = 'none';
+            // Add logout functionality
+            const logoutButton = document.createElement('button');
+            logoutButton.textContent = 'Logout';
+            logoutButton.onclick = function() {
+                logout();
+                loginFormContainer.style.display = 'block';
+                cmsContent.style.display = 'none';
             };
+            cmsContent.insertBefore(logoutButton, cmsContent.firstChild);
 
             const addLinkForm = document.getElementById('addLinkForm');
             const linksList = document.getElementById('linksList');
@@ -512,88 +524,89 @@
 
             // Initial load of links
             updateLinksList();
+
+            // Make removeLink function global so it can be called from HTML
+            window.removeLink = async function(linkId) {
+                try {
+                    const removedLink = await removeLinkFromSupabase(linkId);
+                    
+                    // Remove the link from the preview
+                    const previewLink = document.querySelector(`#previewLinks a[data-id="${linkId}"]`);
+                    if (previewLink) {
+                        previewLink.remove();
+                    }
+
+                    // Remove the link from the links list
+                    const listItem = document.querySelector(`#linksList li[data-id="${linkId}"]`);
+                    if (listItem) {
+                        listItem.remove();
+                    }
+
+                    console.log('Link removed successfully:', removedLink);
+                } catch (error) {
+                    console.error('Error removing link:', error);
+                    alert('Error removing link. Please try again.');
+                }
+            };
+
+            // Add this script to populate the dropdown menu
+            const positionSelect = document.getElementById('position');
+            for (let i = 0; i <= 20; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                positionSelect.appendChild(option);
+            }
+
+            function closeIncorrectLoginDialog() {
+                document.getElementById('incorrectLoginDialog').style.display = 'none';
+            }
+
+            const iconSizeSlider = document.getElementById('iconSize');
+            const iconSizeValue = document.getElementById('iconSizeValue');
+            iconSizeSlider.oninput = function() {
+                iconSizeValue.textContent = this.value;
+            }
+
+            function updateIconPreview() {
+                const linkText = document.getElementById('linkText').value;
+                const iconInput = document.getElementById('icon').value;
+                const iconSize = document.getElementById('iconSize').value;
+                const position = document.getElementById('position').value;
+                const previewLinks = document.getElementById('previewLinks');
+
+                let iconHtml = '';
+                if (iconInput.startsWith('mdi-')) {
+                    iconHtml = `<i class="mdi ${iconInput}" style="font-size: ${iconSize}px;"></i>`;
+                } else if (iconInput.trim() !== '') {
+                    iconHtml = `<img src="${iconInput}" alt="Icon" style="width: ${iconSize}px; height: ${iconSize}px;">`;
+                }
+
+                // Remove existing preview link if it exists
+                const existingPreview = document.getElementById('previewNewLink');
+                if (existingPreview) {
+                    existingPreview.remove();
+                }
+
+                // Create new preview link
+                const newLinkPreview = document.createElement('a');
+                newLinkPreview.href = '#';
+                newLinkPreview.className = 'btn btn-round btn-custom';
+                newLinkPreview.id = 'previewNewLink';
+                newLinkPreview.innerHTML = `${linkText} ${iconHtml}`;
+
+                // Insert the new link at the specified position
+                const insertPosition = position !== '' ? parseInt(position) : previewLinks.children.length;
+                const existingLinks = Array.from(previewLinks.children);
+                if (insertPosition < existingLinks.length) {
+                    previewLinks.insertBefore(newLinkPreview, existingLinks[insertPosition]);
+                } else {
+                    previewLinks.appendChild(newLinkPreview);
+                }
+
+                console.log('Preview updated:', { linkText, iconInput, iconSize, position, insertPosition });
+            }
         });
-
-        async function removeLink(linkId) {
-            try {
-                await removeLinkFromSupabase(linkId);
-                
-                // Remove the link from the preview
-                const previewLink = document.querySelector(`#previewLinks a[data-id="${linkId}"]`);
-                if (previewLink) {
-                    previewLink.remove();
-                }
-
-                // Remove the link from the links list
-                const listItem = document.querySelector(`#linksList li[data-id="${linkId}"]`);
-                if (listItem) {
-                    listItem.remove();
-                }
-
-                console.log('Link removed successfully');
-            } catch (error) {
-                console.error('Error removing link:', error);
-                alert('Error removing link. Please try again.');
-            }
-        }
-
-        // Add this script to populate the dropdown menu
-        const positionSelect = document.getElementById('position');
-        for (let i = 0; i <= 20; i++) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = i;
-            positionSelect.appendChild(option);
-        }
-
-        function closeIncorrectLoginDialog() {
-            document.getElementById('incorrectLoginDialog').style.display = 'none';
-        }
-
-        const iconSizeSlider = document.getElementById('iconSize');
-        const iconSizeValue = document.getElementById('iconSizeValue');
-        iconSizeSlider.oninput = function() {
-            iconSizeValue.textContent = this.value;
-        }
-
-        function updateIconPreview() {
-            const linkText = document.getElementById('linkText').value;
-            const iconInput = document.getElementById('icon').value;
-            const iconSize = document.getElementById('iconSize').value;
-            const position = document.getElementById('position').value;
-            const previewLinks = document.getElementById('previewLinks');
-
-            let iconHtml = '';
-            if (iconInput.startsWith('mdi-')) {
-                iconHtml = `<i class="mdi ${iconInput}" style="font-size: ${iconSize}px;"></i>`;
-            } else if (iconInput.trim() !== '') {
-                iconHtml = `<img src="${iconInput}" alt="Icon" style="width: ${iconSize}px; height: ${iconSize}px;">`;
-            }
-
-            // Remove existing preview link if it exists
-            const existingPreview = document.getElementById('previewNewLink');
-            if (existingPreview) {
-                existingPreview.remove();
-            }
-
-            // Create new preview link
-            const newLinkPreview = document.createElement('a');
-            newLinkPreview.href = '#';
-            newLinkPreview.className = 'btn btn-round btn-custom';
-            newLinkPreview.id = 'previewNewLink';
-            newLinkPreview.innerHTML = `${linkText} ${iconHtml}`;
-
-            // Insert the new link at the specified position
-            const insertPosition = position !== '' ? parseInt(position) : previewLinks.children.length;
-            const existingLinks = Array.from(previewLinks.children);
-            if (insertPosition < existingLinks.length) {
-                previewLinks.insertBefore(newLinkPreview, existingLinks[insertPosition]);
-            } else {
-                previewLinks.appendChild(newLinkPreview);
-            }
-
-            console.log('Preview updated:', { linkText, iconInput, iconSize, position, insertPosition });
-        }
     </script>
 </body>
 </html>

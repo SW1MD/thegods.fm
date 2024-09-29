@@ -113,47 +113,33 @@
         <!-- 4. Start: Main Buttons Section --------------->
         <div class="container" style="max-width: 680px" id="main-buttons">
             <div id="dynamic-links-container"></div>
-        
-            <!-- Change the main button description info, add or remove buttons here ------------------------------------>
-            <!-- Button #1 - replace the "#" with the actual link as well as the text of the button #1 here -->
             
+            <!-- Your existing static links -->
             <div class="mt-3 pt-2">
                 <a href="https://soundcloud.com/thegodspresents" style="width: 100%" class="btn btn-round btn-custom">Soundcloud <i class="mdi mdi-soundcloud"></i></a>
             </div>
             
-            <!-- Dynamic links will be inserted here -->
-            
-
             <div class="mt-3 pt-2">
                 <a href="https://www.facebook.com/TheGodsPresents" style="width: 100%" class="btn btn-round btn-custom">Facebook <i class="mdi mdi-facebook"></i></a>
             </div>
-
+            
             <div class="mt-3 pt-2">
                 <a href="https://discord.com/invite/5622pfRbST" style="width: 100%" class="btn btn-round btn-c btn-custom">Discord <i class="mdi mdi-discord"></i></a>
             </div>
-
+            
             <div class="mt-3 pt-2">
                 <a href="https://www.instagram.com/thegodspresents/" style="width: 100%" class="btn btn-round btn-c btn-custom">Instagram <i class="mdi mdi-instagram"></i></a>
             </div>
-
+            
             <div class="mt-3 pt-2">
                 <a href="https://www.tiktok.com/@thegodspresents" style="width: 100%" class="btn btn-round btn-c btn-custom tiktok-button">
                     TikTok 
                     <img src="https://static-00.iconduck.com/assets.00/tik-tok-icon-1777x2048-102ej595.png" alt=" " class="tiktok-icon">
                 </a>
             </div>
-
-            
-
-            <div class="mt-3 pt-2">
-                <!--<a href="#" style="width: 100%" class="btn btn-round btn-custom">MERCH <i class="mbri-shopping-cart"></i></a> -->
-            </div>
-            
         </div>
         <!-- 4. End: Main Buttons Section ------------------->
-
-       
-
+        
 
         <!-- 5. Start: Modal Form Contents -->
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -326,11 +312,44 @@
         <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
         <script src="assets/js/supabase-client.js"></script>
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                if (typeof window.loadDynamicLinks === 'function') {
-                    window.loadDynamicLinks();
-                } else {
-                    console.error('loadDynamicLinks function not found');
+            document.addEventListener('DOMContentLoaded', async function() {
+                try {
+                    const { createClient } = supabase;
+                    const supabaseClient = createClient('https://xgparfncmrkqzsxhblct.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhncGFyZm5jbXJrcXpzeGhibGN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc0MzUyMTMsImV4cCI6MjA0MzAxMTIxM30.k05aVebxnvk_dK_qaAvl97msNfvEkbAP1qi_jzxIXMs');
+
+                    const { data: links, error } = await supabaseClient
+                        .from('links')
+                        .select('*')
+                        .order('position', { ascending: true, nullsLast: true });
+
+                    if (error) throw error;
+
+                    const dynamicLinksContainer = document.getElementById('dynamic-links-container');
+                    
+                    links.forEach(link => {
+                        const linkElement = document.createElement('div');
+                        linkElement.className = 'mt-3 pt-2';
+                        
+                        const anchorElement = document.createElement('a');
+                        anchorElement.href = link.url;
+                        anchorElement.style.width = '100%';
+                        anchorElement.className = 'btn btn-round btn-custom';
+                        
+                        let iconHtml = '';
+                        if (link.icon) {
+                            if (link.icon.startsWith('mdi-')) {
+                                iconHtml = `<i class="mdi ${link.icon}" style="font-size: ${link.iconSize || 24}px;"></i>`;
+                            } else if (link.icon.trim() !== '') {
+                                iconHtml = `<img src="${link.icon}" alt="" style="width: ${link.iconSize || 24}px; height: ${link.iconSize || 24}px;">`;
+                            }
+                        }
+                        
+                        anchorElement.innerHTML = `${link.name} ${iconHtml}`;
+                        linkElement.appendChild(anchorElement);
+                        dynamicLinksContainer.appendChild(linkElement);
+                    });
+                } catch (error) {
+                    console.error('Error loading dynamic links:', error);
                 }
             });
         </script>

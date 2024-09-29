@@ -149,7 +149,7 @@
         #previewLinks a,
         #previewSection a {
             display: block;
-            width: 100%;
+            width: 100%;  
             padding: 10px;
             margin-bottom: 10px;
             text-align: center;
@@ -281,44 +281,9 @@
         <img src="assets/images/icon.png" alt="The Gods CMS" class="fixed-image"/>
     </div>
     
-    <div id="loginForm" class="window">
-        <div class="title-bar">
-            <div class="title-bar-text">Login</div>
-        </div>
-        <div class="window-body">
-            <form id="loginFormElement">
-                <div class="field-row-stacked">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" required>
-                </div>
-                <div class="field-row-stacked">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" required>
-                </div>
-                <div class="field-row">
-                    <button type="submit">Login</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <!-- Remove the login form and incorrect login dialog -->
 
-    <!-- Add this new incorrect login dialog -->
-    <div id="incorrectLoginDialog" class="window">
-        <div class="title-bar">
-            <div class="title-bar-text">Login Error</div>
-            <div class="title-bar-controls">
-                
-            </div>
-        </div>
-        <div class="window-body">
-            <p>Incorrect username or password. Please try again.</p>
-            <div class="button-container">
-                <button onclick="closeIncorrectLoginDialog()">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="cmsContent">
+    <div id="cmsContent" style="display: flex;">
         <div class="window main-window">
             <div>
                 <div class="title-bar">
@@ -394,56 +359,48 @@
     </div>
 
     <script type="module">
-        import { addLinkToSupabase, getLinksFromSupabase, removeLinkFromSupabase, authenticateUser, checkSession, logout } from './assets/js/supabase-client.js';
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+        const supabase = createClient('https://xgparfncmrkqzsxhblct.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhncGFyZm5jbXJrcXpzeGhibGN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc0MzUyMTMsImV4cCI6MjA0MzAxMTIxM30.k05aVebxnvk_dK_qaAvl97msNfvEkbAP1qi_jzxIXMs');
+
+        async function addLinkToSupabase(linkName, linkUrl, icon, iconSize, position) {
+            const { data, error } = await supabase
+                .from('links')
+                .insert([
+                    { 
+                        name: linkName, 
+                        url: linkUrl, 
+                        icon: icon, 
+                        iconSize: parseInt(iconSize),
+                        position: position !== '' ? parseInt(position) : null
+                    }
+                ]);
+            
+            if (error) throw error;
+            return data;
+        }
+
+        async function getLinksFromSupabase() {
+            const { data, error } = await supabase
+                .from('links')
+                .select('*')
+                .order('position', { ascending: true, nullsLast: true });
+            
+            if (error) throw error;
+            return data;
+        }
+
+        async function removeLinkFromSupabase(linkId) {
+            const { data, error } = await supabase
+                .from('links')
+                .delete()
+                .eq('id', linkId);
+            
+            if (error) throw error;
+            return data;
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
-            const loginForm = document.getElementById('loginFormElement');
-            const loginFormContainer = document.getElementById('loginForm');
-            const cmsContent = document.getElementById('cmsContent');
-            const incorrectLoginDialog = document.getElementById('incorrectLoginDialog');
-
-            // Check session on page load
-            if (checkSession()) {
-                loginFormContainer.style.display = 'none';
-                cmsContent.style.display = 'flex';
-                console.log('Session active, CMS content displayed');
-            }
-
-            loginForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-
-                console.log('Login attempt:', username);
-
-                try {
-                    const result = await authenticateUser(username, password);
-                    console.log('Authentication result:', result);
-
-                    if (result.success) {
-                        loginFormContainer.style.display = 'none';
-                        cmsContent.style.display = 'flex';
-                        console.log('Login successful, CMS content displayed');
-                    } else {
-                        incorrectLoginDialog.style.display = 'block';
-                        console.log('Login failed:', result.message);
-                    }
-                } catch (error) {
-                    console.error('Authentication error:', error);
-                    alert('An error occurred during login. Please check the console for details.');
-                }
-            });
-
-            // Add logout functionality
-            const logoutButton = document.createElement('button');
-            logoutButton.textContent = 'Logout';
-            logoutButton.onclick = function() {
-                logout();
-                loginFormContainer.style.display = 'block';
-                cmsContent.style.display = 'none';
-            };
-            cmsContent.insertBefore(logoutButton, cmsContent.firstChild);
-
             const addLinkForm = document.getElementById('addLinkForm');
             const linksList = document.getElementById('linksList');
 
@@ -495,7 +452,7 @@
                             <span>${link.name} - ${link.url} 
                             (Icon: ${link.icon ? 'Yes' : 'No'}, 
                             Size: ${link.iconSize || 'Default'},
-                            Position: ${link.position || 'Not set'})
+                            Position: ${link.position !== null ? link.position : 'Not set'})
                             </span>
                             <button onclick="removeLink(${link.id})" class="remove-link-button">X</button>
                         `;
@@ -556,10 +513,6 @@
                 option.value = i;
                 option.textContent = i;
                 positionSelect.appendChild(option);
-            }
-
-            function closeIncorrectLoginDialog() {
-                document.getElementById('incorrectLoginDialog').style.display = 'none';
             }
 
             const iconSizeSlider = document.getElementById('iconSize');
